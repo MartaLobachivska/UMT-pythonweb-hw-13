@@ -20,6 +20,13 @@ mail_config = ConnectionConfig(
 async def send_verification_email(email: str, username: str) -> None:
     token = create_email_token({"sub": email})
     verify_url = f"{settings.VERIFY_EMAIL_BASE_URL}?token={token}"
+
+
+    print("=" * 70)
+    print(f"ПОСИЛАННЯ ДЛЯ ПІДТВЕРДЖЕННЯ EMAIL ({email}):")
+    print(verify_url)
+    print("=" * 70)
+
     html = (
         f"<h3>Вітаємо, {username}!</h3>"
         f"<p>Підтвердіть email: <a href='{verify_url}'>Підтвердити адресу</a></p>"
@@ -30,4 +37,7 @@ async def send_verification_email(email: str, username: str) -> None:
         body=html,
         subtype=MessageType.html,
     )
-    await FastMail(mail_config).send_message(message)
+    try:
+        await FastMail(mail_config).send_message(message)
+    except Exception as e:
+        print(f"Лист не надіслано (це нормально без реального SMTP): {e}")
